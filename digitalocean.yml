@@ -24,7 +24,7 @@
       ssh_pub_key={{ lookup('file', '~/.ssh/id_rsa.pub') }}
       api_token={{ do_token }}
     register: my_ssh_key
- # register służy do zapisu w pamięci jakiś danych   
+ # register służy do zapisu w pamięci zdefiniowanych zmiennych   
  # wszystkie dane trzeba wyciagac z aktualnego digitalOcean id 
  # element z listy wrzucony w "" działa bez wyrzucaniu komunikatu o starych wersjiach  
   - name: ensure droplet one exists
