@@ -1,2 +1,0 @@
-# AnsibleTest
-Ansible Test Playbooks 
