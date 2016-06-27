@@ -1,0 +1,45 @@
+--- # trzeba pamiętać o wcięciach w wierszach
+- hosts: digitalocean
+  vars_files:
+    - secrets.yml
+  vars:
+    droplets:
+    - AutoDropletOne
+    - AutoDropletTwo
+    - AutoDropletThree
+
+  tasks:
+#trzeba pamietać aby cytować nazwę użytkownika
+  - name: ensure ssh key exists
+    user: >
+      name={{ ansible_user }} 
+      generate_ssh_key=yes
+      ssh_key_file=.ssh/id_rsa
+
+  - name: ensure key exists at DigitalOcean
+    digital_ocean: >
+      state=present
+      command=ssh
+      name=my_ssh_key
+      ssh_pub_key={{ lookup('file', '~/.ssh/id_rsa.pub') }}
+      api_token={{ do_token }}
+    register: my_ssh_key
+ # register służy do zapisu w pamięci jakiś danych   
+ # wszystkie dane trzeba wyciagac z aktualnego digitalOcean id 
+ # element z listy wrzucony w "" działa bez wyrzucaniu komunikatu o starych wersjiach  
+  - name: ensure droplet one exists
+    digital_ocean: >
+      state=absent
+      command=droplet
+      name="{{item}}"
+      unique_name=yes
+      size_id=512mb
+      region_id=fra1
+      image_id=ubuntu-15-10-x64
+      ssh_key_ids={{ my_ssh_key.ssh_key.id }}
+      api_token={{ do_token }}
+    with_items: droplets 
+    register: droplet_details
+
+  - debug: msg="IP is {{ item.droplet.ip_address }}"
+    with_items: droplet_details.results
